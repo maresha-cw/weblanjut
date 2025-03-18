@@ -7,7 +7,7 @@
           class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4"
       >
         <div>
-          <h3 class="fw-bold mb-3">Mahasiswa</h3>
+          <h3 class="fw-bold mb-3">Manage Mahasiswa</h3>
           <h6 class="op-7 mb-2">Free Bootstrap 5 Admin Dashboard</h6>
         </div>
       </div>
@@ -22,92 +22,6 @@
                 </div>
             </div>
             <div class="card-body">
-                <!-- Modal -->
-                <div
-                    class="modal fade"
-                    id="addRowModal"
-                    tabindex="-1"
-                    role="dialog"
-                    aria-hidden="true"
-                >
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header border-0">
-                                <h5 class="modal-title">
-                                    <span class="fw-mediumbold"> New</span>
-                                    <span class="fw-light"> Row </span>
-                                </h5>
-                                <button
-                                    type="button"
-                                    class="close"
-                                    data-dismiss="modal"
-                                    aria-label="Close"
-                                >
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <p class="small">
-                                    Create a new row using this form, make sure you
-                                    fill them all
-                                </p>
-                                <form>
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="form-group form-group-default">
-                                                <label>Name</label>
-                                                <input
-                                                    id="addName"
-                                                    type="text"
-                                                    class="form-control"
-                                                    placeholder="fill name"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 pe-0">
-                                            <div class="form-group form-group-default">
-                                                <label>Position</label>
-                                                <input
-                                                    id="addPosition"
-                                                    type="text"
-                                                    class="form-control"
-                                                    placeholder="fill position"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group form-group-default">
-                                                <label>Office</label>
-                                                <input
-                                                    id="addOffice"
-                                                    type="text"
-                                                    class="form-control"
-                                                    placeholder="fill office"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer border-0">
-                                <button
-                                    type="button"
-                                    id="addRowButton"
-                                    class="btn btn-primary"
-                                >
-                                    Add
-                                </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-danger"
-                                    data-dismiss="modal"
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="table-responsive">
                     <table
@@ -152,23 +66,36 @@
                             <td>
                                 <div class="form-button-action">
                                     <button
-                                        type="button"
                                         data-bs-toggle="tooltip"
-                                        title=""
-                                        class="btn btn-link btn-primary btn-lg"
-                                        data-original-title="Edit Task"
+                                        title="Student Detail"
+                                        class="btn btn-link btn-success detail-data"
+                                        data-original-title="Student Detail"
+                                        data-url="{{ route('mhsDetail', [$mhs->nrp]) }}"
+                                    >
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                    <button
+                                        data-bs-toggle="tooltip"
+                                        title="Edit Student"
+                                        class="btn btn-link btn-primary edit-data"
+                                        data-original-title="Edit Student"
+                                        data-url="{{ route('mhsUpdate', [$mhs->nrp]) }}"
                                     >
                                         <i class="fa fa-edit"></i>
                                     </button>
-                                    <button
-                                        type="button"
-                                        data-bs-toggle="tooltip"
-                                        title=""
-                                        class="btn btn-link btn-danger"
-                                        data-original-title="Remove"
-                                    >
-                                        <i class="fa fa-times"></i>
-                                    </button>
+                                    <form method="post" action="{{ route('mhsDelete', [$mhs->nrp]) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button
+                                            type="submit"
+                                            data-bs-toggle="tooltip"
+                                            title="Delete Student"
+                                            class="btn btn-link btn-danger delete-data"
+                                            data-original-title="Remove Student"
+                                        >
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -187,5 +114,45 @@
 @endsection
 
 @section('ExtraJS')
+<script src="{{ asset('assets/js/plugin/sweetalert2/sweetalert2.all.min.js') }}"></script>
+<script>
+    $("#table-student").DataTable({
+        pageLength: 25,
+    });
+    $('.detail-data').click(function () {
+        window.location.href = $(this).data('url');
+    })
+    $('.edit-data').click(function () {
+        window.location.href = $(this).data('url');
+    })
+    $('.delete-data').click(function (e) {
+        e.preventDefault()
+        Swal.fire({
+            title: "Confirm to delete this data?",
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $(e.target).closest("form").submit()
+            }
+        })
+    })
+    @error('err_msg')
+    $.notify({
+        message: "{{ $message }}"
+    }, {
+        type: "danger",
+        delay: 4000,
+    })
+    @enderror
 
+    @if (session('status'))
+    $.notify({
+        message: "{{ session('status') }}"
+    }, {
+        delay:5000,
+        type: "info"
+    })
+    @endif
+</script>
 @endsection
